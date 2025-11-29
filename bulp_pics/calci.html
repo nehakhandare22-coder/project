@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Calculator</title>
+        <style>
+    body{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #222;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* Normal calculator (OFF state) */
+   .calc-box{
+    background: #000;
+    padding: 25px;
+    border-radius: 25px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.6);
+    width: 280px;
+    transition: 0.3s;
+    }
+
+/* ON state color */
+    .calc-on{
+    background: #1e3a8a !important;   /* Blue shade */
+    box-shadow: 0 0 30px #3b82f6;
+    }
+
+
+    #result{
+        width: 100%;
+        height: 60px;
+        font-size: 28px;
+        text-align: right;
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        margin-bottom: 15px;
+        background: #eee;
+    }
+
+    .btn-row{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    input[type="button"]{
+        width: 60px;
+        height: 60px;
+        font-size: 22px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        color: white;
+        background: #333;
+        transition: 0.2s;
+    }
+
+    input[type="button"]:hover{
+        background: #555;
+    }
+
+    /* Operator buttons (+, -, *, /, =) */
+    .op{
+        background: #ff9500;
+    }
+    .op:hover{
+        background: #e08900;
+    }
+
+    /* Clear button */
+    #btn17{
+        width: 100%;
+        border-radius: 12px;
+        background: #d9534f;
+    }
+    #btn17:hover{
+        background: #c9302c;
+    }
+
+    button{
+        padding: 10px 20px;
+        margin: 10px;
+        font-size: 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: none;
+        background: #007bff;
+        color: white;
+    }
+    #b2{
+        background: #d9534f;
+    }
+</style>
+
+
+        <script>
+            function show(){
+                for(var i=1; i<=17; i++){
+                    document.getElementById("btn"+i).disabled=false;
+                }
+                document.getElementById("b2").disabled=false;
+                document.getElementById("result").disabled = false;
+                document.querySelector(".calc-box").classList.add("calc-on");
+            }
+            function clear_fn(){
+                document.getElementById("result").value="";
+            }
+            function off_fn(){
+                for(var i=1; i<=17; i++){
+                    document.getElementById("btn"+i).disabled=true;
+                }
+                document.getElementById("result").value = "";
+                document.getElementById("result").disabled = true;
+                document.getElementById("b2").disabled=true;
+                document.querySelector(".calc-box").classList.remove("calc-on");
+            }
+        </script>
+    </head>
+    <body>
+    <button onclick="show()">ON</button>
+    <button id="b2" onclick="off_fn()" disabled>OFF</button>
+
+    <div class="calc-box">
+        <input type="text" id="result" disabled>
+
+        <div class="btn-row">
+            <input type="button" id="btn1" value="7" onclick="result.value+=7" disabled>
+            <input type="button" id="btn2" value="8" onclick="result.value+=8" disabled>
+            <input type="button" id="btn3" value="9" onclick="result.value+=9" disabled>
+            <input type="button" id="btn4" value="+" class="op" onclick="result.value+='+'" disabled>
+        </div>
+
+        <div class="btn-row">
+            <input type="button" id="btn5" value="6" onclick="result.value+=6" disabled>
+            <input type="button" id="btn6" value="5" onclick="result.value+=5" disabled>
+            <input type="button" id="btn7" value="4" onclick="result.value+=4" disabled>
+            <input type="button" id="btn8" value="-" class="op" onclick="result.value+='-'" disabled>
+        </div>
+
+        <div class="btn-row">
+            <input type="button" id="btn9" value="3" onclick="result.value+=3" disabled>
+            <input type="button" id="btn10" value="2" onclick="result.value+=2" disabled>
+            <input type="button" id="btn11" value="1" onclick="result.value+=1" disabled>
+            <input type="button" id="btn12" value="*" class="op" onclick="result.value+='*'" disabled>
+        </div>
+
+        <div class="btn-row">
+            <input type="button" id="btn13" value="0" onclick="result.value+=0" disabled>
+            <input type="button" id="btn14" value="." onclick="result.value+='.'" disabled>
+            <input type="button" id="btn15" value="/" class="op" onclick="result.value+='/'" disabled>
+            <input type="button" id="btn16" value="=" class="op" onclick="result.value = eval(result.value)" disabled>
+        </div>
+
+        <input type="button" id="btn17" value="Clear" onclick="clear_fn()" disabled>
+    </div>
+</body>
+
+    
+</html>
+
+
+
+
+
+
+

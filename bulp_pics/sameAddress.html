@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Same Address</title>
+        <script>
+            function SameAddress(){
+                var a=document.getElementById("use").value;
+                document.getElementById("userput").value=a;
+                document.getElementById("userput").readOnly=true;
+            }
+            function notSameAddress(){
+                var b=document.getElementById("userput").value;
+                document.getElementById("userput").value="";
+            }
+        </script>
+    </head>
+    <body>
+        Address:- <input type="text" id="use"></br>
+        <input type="radio" name="Address" onclick="SameAddress()">Yes
+        <input type="radio" name="Address" onclick="notSameAddress()">No</br>
+        Permanent Address:- <input type="text" id="userput">
+    </body>
+</html>

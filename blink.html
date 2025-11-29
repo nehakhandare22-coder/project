@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>ON OFF</title>
+    <style>
+        #root {
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: purple;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: darkviolet;
+        }
+    </style>
+    <script>
+        function on_button(){
+            var on=document.getElementById("root");
+            on.style.display="block";
+        }
+        function off_button(){
+            var off=document.getElementById("root");
+            off.style.display="none";
+        }
+    </script>
+
+</head>
+<body>
+    <h1 id="root">hello i am neha khandare</h1>
+    <button onclick="on_button()">ON</button>
+    <button onclick="off_button()">OFF</button>
+</body>
+</html>
