@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+        <style>
+            #mgs {
+                margin-left: 10px;
+                color: green;
+                font-weight: bold;
+            }
+            body{
+                font-family: Arial, sans-serif;
+                background:#f2f2f2;
+            }
+
+            /* MAIN BOX */
+            .salary{
+                width:420px;
+                margin:6px auto;
+                background:#fff;
+                padding:8px 12px;
+                border:1px solid #ccc;
+                border-radius:5px;
+            }
+
+            /* LABEL + INPUT ROW */
+            .salary label{
+                display:inline-block;
+                width:190px;
+                font-size:14px;
+            }
+
+            /* INPUTS */
+            .salary input,
+            .salary select{
+                width:190px;
+                padding:4px;
+                font-size:14px;
+            }
+
+            /* RADIO BUTTON FIX */
+            .salary input[type="radio"]{
+                width:auto;
+                margin-left:5px;
+                margin-right:2px;
+            }
+
+            /* REMOVE BIG GAPS */
+            .salary br{
+                display:none;
+            }
+
+            /* CL SECTION */
+            .cl-section{
+                background:#f9f9f9;
+                border-left:4px solid #007bff;
+            }
+
+            /* ADDITION SECTION */
+            .salary input[placeholder$="%"]{
+                width:120px;
+                margin-bottom:4px;
+            }
+
+            /* FINAL AMOUNT HIGHLIGHT */
+            #final_salary{
+                background:#e8ffe8;
+                font-weight:bold;
+                border:2px solid green;
+            }
+            .salary input:enabled:focus,
+            .salary select:enabled:focus{
+                background:#e8ffe8;     /* light green */
+                border:2px solid green;
+            }
+
+
+
+        </style>
+
+        <script>
+            function open_next(){
+                var year=document.getElementById("year").value;
+                if (year.length==4){
+                    document.getElementById("month").disabled = false;
+                    markFilled(document.getElementById("year"));
+                }
+                else{
+                    resetAll(); 
+                }
+            }
+            function month_change(){
+                var year=document.getElementById("year").value;
+                var month=document.getElementById("month").value;
+                var days=document.getElementById("days");
+                var mgs=document.getElementById("mgs");
+                var per_day=document.getElementById("per_day");
+                if (month !== ""){
+                    days.disabled=false;
+                    per_day.disabled=false;
+                    if(month=="feb"){
+                        if((year%4==0 && year%100!=0) || (year%400==0)){
+                            days.value="29";
+                            mgs.innerText="This is leap year";
+                        }else{
+                            days.value="28";
+                        }
+                    }
+                    else{
+                        days.value=month;
+                    }
+                } else{
+                    days.disabled=true;
+                    days.value="";
+                    per_day.disabled=true;
+                    per_day.value="";
+
+                }
+                
+            }
+            function show_next(){
+                var per_day=document.getElementById("per_day").value;
+                var p_day=document.getElementById("p_day");
+                var absent=document.getElementById("absent");
+                var basic=document.getElementById("basic_sal");
+                if(per_day!=="" && per_day>=3){
+                    p_day.disabled=false;
+                    absent.disabled=false;
+                    basic.disabled=false;
+                }
+            }
+            function calculateBasicSalary(){
+                var per_day_sal=parseInt(document.getElementById("per_day").value);
+                var present_day=parseInt(document.getElementById("p_day").value);
+                var basic_sal=document.getElementById("basic_sal");
+                if(!isNaN(per_day_sal) && !isNaN(present_day)){
+                    basic_sal.value=per_day_sal*present_day;
+                }else{
+                    basic_sal.value="";
+                }
+
+            }
+            $(document).ready(function(){
+                $(".cl-section").hide();
+                $("#cl_allow").click(function(){
+                    $(".cl-section").slideDown();
+                    $(".cl-section input").prop("disabled",false);
+                });
+                $("#no_allow").click(function(){
+                    $(".cl-section").slideUp();
+                    $(".cl-section input").prop("disabled",true).val("");
+                    $("#hr,#travel,#sd,#mb,#food").val("");
+                    $('#add_amount').val("");
+                    $("#final_salary").val("");
+                });
+            });
+            function calculateAbsent(){
+                var total=parseInt(document.getElementById("days").value);
+                var absent=parseInt(document.getElementById("absent").value);
+                var present=document.getElementById("p_day");
+                if(!isNaN(total) && !isNaN(absent)){
+                    if(absent>total){
+                        alert("Absent days cannot be greater than total days")
+                        document.getElementById("absent").value="";
+                        present.value="";
+                        return;
+                    }
+                    present.value=total-absent;
+                    calculateBasicSalary(); 
+                }
+
+            }
+            function cl_calculate(){
+                var cl=parseInt(document.getElementById("cl_p").value);
+                var absent_day=parseInt(document.getElementById("absent").value);
+                var total=parseInt(document.getElementById("p_day").value);
+                var per_day_sal=document.getElementById("per_day").value;
+                var cl_basic=document.getElementById("cl_basic");
+                if (isNaN(total) || isNaN(per_day_sal)  || isNaN(absent_day) || isNaN(cl)) {
+                    return;
+                }
+                if(cl>6){
+                    alert="Cl cannot be more than 6 days";
+                    cl=6;
+                    document.getElementById("cl_p").value=6;
+                }
+                var new_ab=absent_day-cl;
+                var new_p=total+new_ab;
+                var cl_new_basic=new_p*per_day_sal;
+                document.getElementById("new_day").value=new_p;
+                document.getElementById("total_absent").value=new_ab;
+                document.getElementById("cl_basic").value=cl_new_basic;
+                
+            }
+            function get_active(){
+                var cl_basic=parseFloat(document.getElementById("cl_basic").value);
+                var normal_basic=parseFloat(document.getElementById("basic_sal").value);
+                if(!isNaN(cl_basic) && cl_basic>0){
+                    return cl_basic;
+                }
+                if(!isNaN(normal_basic) && normal_basic>0){
+                    return normal_basic;
+                }
+                return 0;
+            }
+            function calculateAdditionSalary(){
+                var basic=get_active();
+                if(basic==0){
+                    document.getElementById("add_amount").value="";
+                    document.getElementById("final_salary").value="";
+                    return;
+                }
+                var hr=parseFloat(document.getElementById("hr").value);
+                var travel=parseFloat(document.getElementById("travel").value);
+                var sd=parseFloat(document.getElementById("sd").value);
+                var mb=parseFloat(document.getElementById("mb").value);
+                var food=parseFloat(document.getElementById("food").value);
+                var total_percentage=hr+travel+sd+mb+food;
+                var addition_amt=(basic*total_percentage)/100;
+                var final_salary=basic+addition_amt;
+                document.getElementById("add_amount").value=addition_amt.toFixed(2);
+                document.getElementById("final_salary").value=final_salary.toFixed(2);
+            }
+            function resetAll() {
+                $("#month").prop("disabled", true).val("");
+                $("#days, #per_day, #absent, #p_day, #basic_sal").prop("disabled", true).val("");
+                $(".cl-section").hide();
+                $(".cl-section input").prop("disabled", true).val("");
+                $("input[name='cl']").prop("checked", false);  
+                $("#hr, #travel, #sd, #mb, #food").val("");                   
+                $("#add_amount, #final_salary").val("");    
+                $("input, select").removeClass("filled");
+                $("#mgs").text("");
+            }     
+        </script>
+    </head>
+    <body>
+        <div class="salary">
+            <label>Year </label>
+            <input type="number" id="year" oninput="open_next()" placeholder="enter year"/><br><br>
+        </div>
+        <div class="salary">
+            <label>Select Months :- </label>
+            <select onchange="month_change(this.value)" id="month"  disabled>
+                <option value="">Select Month</option>
+                <option value="31">January</option>
+                <option value="feb">Febuary</option>
+                <option value="31">March</option>
+                <option value="30">April</option>
+                <option value="31">May</option>
+                <option value="30">June</option>
+                <option value="31">July</option>
+                <option value="31">August</option>
+                <option value="30">September</option>
+                <option value="31">Octember</option>
+                <option value="30">November</option>
+                <option value="31">December</option>
+            </select>
+        </div><br>
+        <div class="salary">
+            <label>Totol Days In Months </label>
+            <input type="number" id="days" readonly  disabled/>
+            <span id="mgs"></span>
+        </div><br>
+        <div class="salary">
+            <label>Emp Per Day Salary</label>
+            <input type="number" id="per_day" oninput="show_next(); calculateBasicSalary()" disabled/>
+        </div><br>
+        <div class="salary">
+            <label>Emp Absent Days</label>
+            <input type="number" id="absent" oninput="calculateAbsent()" disabled/>
+        </div><br>
+        <div class="salary">
+            <label>Emp Present Days</label>
+            <input type="number" id="p_day"  disabled/>
+        </div><br> 
+        <div class="salary">
+            <label>Employee Basic Salary</label>
+            <input type="number" id="basic_sal" disabled/>
+        </div><br>   
+        <div class="salary">
+            <label>Allow CL</label>
+            <input type="radio" name="cl" id="cl_allow" >Yes
+            <input type="radio" name="cl" id="no_allow" >No
+        </div><br>
+        <div class="salary cl-section">
+            <label>Enter CL Days</label>
+            <input type="number" id="cl_p" oninput="cl_calculate()" disabled/>
+        </div><br>
+        <div class="salary cl-section">
+            <label>Employee Present Days</label>
+            <input type="number" id="new_day" disabled/>
+        </div><br>
+        <div class="salary cl-section">
+            <label>Employee Absent Days</label>
+            <input type="number" id="total_absent" disabled/>
+        </div><br>
+        <div class="salary cl-section">
+            <label>Basic Salary</label>
+            <input type="number" id="cl_basic" disabled/>
+        </div><br>
+        <div class="salary">
+            <label>Addition To Salary</label><br>
+            <input type="number" id="hr" placeholder="HR%" oninput="calculateAdditionSalary()"/><br><br>
+            <input type="number" id="travel" placeholder="Travel%" oninput="calculateAdditionSalary()"/><br><br>
+            <input type="number" id="sd" placeholder="SD%" oninput="calculateAdditionSalary()"/><br><br>
+            <input type="number" id="mb" placeholder="MB%" oninput="calculateAdditionSalary()"/><br><br>
+            <input type="number" id="food" placeholder="FOOD%" oninput="calculateAdditionSalary()"/><br><br>
+        </div><br>
+        <div class="salary">
+            <label>Addition Amount</label>
+            <input type="number" id="add_amount" placeholder="Addition Amount" readonly/><br><br>
+        </div>
+        <div class="salary">
+            <label>Final Salary</label>
+            <input type="number" id="final_salary" placeholder="Final Salary" readonly/>
+        </div>
+        
+
+
+
+    </body>
+</html>

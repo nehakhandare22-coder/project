@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfect Form</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        /* Wrapper for each row */
+        .row {
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Label design */
+        label {
+            width: 150px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Input box */
+        .box {
+            width: 300px;
+            height: 35px;
+            padding: 5px 10px;
+            font-size: 16px;
+            border: 1px solid gray;
+            border-radius: 5px;
+        }
+
+        /* For password dots */
+        .hidden {
+            -webkit-text-security: disc;
+        }
+
+        /* Eye icon design */
+        .password-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .eye {
+            position: absolute;
+            right: 10px;
+            top: 7px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Strength colors */
+        #w { color: red; display: none; margin-left: 10px; }
+        #g { color: orange; display: none; margin-left: 10px; }
+        #s { color: green; display: none; margin-left: 10px; }
+
+        .hint {
+            color: blue;
+            font-size: 14px;
+            margin-left: 10px;
+            
+        }
+
+
+    </style>
+
+    <script>
+        function show_hint(){
+            var n=document.getElementsByClassName("hint")[0];
+            n.innerText="Please enter your name"; 
+        }
+        function hide_hint(){
+            var m=document.getElementsByClassName("hint")[0];
+            m.innerText="";
+        }
+        
+
+    
+
+        
+
+        var captcha="";
+        function generateCaptcha(){
+        var cap="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        captcha="";
+        for(var i=0;i<6;i++){
+            var random= Math.floor(Math.random() * cap.length);
+            captcha+=cap[random];
+
+        }
+        document.getElementById("captchaText").value=captcha;
+    }
+    
+        function pass_key(DATA){
+                var eight=RegExp('(?=.{8,})');
+                var upper=RegExp('(?=.*[A-Z])');
+                var lower=RegExp('(?=.*[a-z])');
+                var number=RegExp('(?=.*[0-9])');
+                var special=RegExp('(?=.*[!@#$%^&*])');
+                var manage=[eight,upper,lower,number,special];
+                var show=0;
+                for(var i=0;i<manage.length;i++){
+                    if(manage[i].test(DATA)){
+                        show++ ;
+                    }
+                }
+
+                document.getElementById("w").style.display = "none";
+                document.getElementById("g").style.display = "none";
+                document.getElementById("s").style.display = "none";
+
+                if(show <= 2) {
+                    document.getElementById("w").style.display = "inline";
+                }
+                else if(show <= 4){
+                    document.getElementById("g").style.display = "inline";
+                } 
+                else document.getElementById("s").style.display = "inline";
+            }
+
+  
+        let show = false;
+        function eye_click(){
+            let p = document.getElementById("upas");
+            if(show){
+                p.classList.add("hidden"); 
+            } else {
+                p.classList.remove("hidden"); 
+            }
+            show = !show;
+        }
+        function validation(){
+            var uname=document.getElementById("uname").value;
+            Result=true;
+            if(uname==""){
+                document.getElementById("uname_error").innerText="Please fill your name";
+                Result=false;
+            }
+            var Fname=document.getElementById("fname").value;
+            if(Fname==""){
+                document.getElementById("fname_error").innerText="please fill your father name";
+                Result=false;
+            }
+            var Mname=document.getElementById("mname").value;
+            if(Mname==""){
+                document.getElementById("mname_error").innerText="please fill your mother name";
+                Result=false;
+            }
+            var Uemail=document.getElementById("uemail").value;
+            if(Uemail==""){
+                document.getElementById("uemail_error").innerText="please fill your email";
+                Result=false;
+            }
+            var Upass=document.getElementById("upas").value;
+            if(Upass==""){
+                document.getElementById("upas_error").innerText="please fill your password";
+                Result=false;
+            }
+            var Mobile=document.getElementById("num").value;
+            if(Mobile==""){
+                document.getElementById("num_error").innerText="please fill your Mobile number";
+                Result=false;
+            }
+            var Date=document.getElementById("date").value;
+            if(Date==""){
+                document.getElementById("date_error").innerText="please fill date";
+                Result=false;
+            }
+            var Time=document.getElementById("time").value;
+            if(Time==""){
+                document.getElementById("time_error").innerText="please fill the time";
+                Result=false;
+            }
+            var File=document.getElementById("file").value;
+            if(File==""){
+                document.getElementById("file_error").innerText="please fill the file";
+                Result=false;
+            }
+            var Add=document.getElementById("use").value;
+            if(Add==""){
+                document.getElementById("use_error").innerText="please fill the address";
+                Result=false;
+            }
+            var P=document.getElementById("userput").value;
+            if(P==""){
+                document.getElementById("padd_error").innerText="please fill perment address";
+                Result=false;
+            }
+            var State=document.getElementById("state").value;
+            if(State==""){
+                document.getElementById("state_error").innerText="please select state";
+                Result=false;
+            }
+            var dis=false;
+            var G=document.getElementsByName("gender").length;
+            var Gender=document.getElementsByName("gender");
+            for(var i=0;i<G;i++){
+                if(Gender[i].checked==true){
+                    dis=true;
+                }
+            }
+            if(dis==false){
+                document.getElementById("gender_error").innerText="please select your gender";
+                Result=false;
+            }
+            var ch=false;
+            var countcheck=document.getElementsByName("skill").length;
+            var sk=document.getElementsByName("skill");
+            for (var i=0; i<countcheck;i++){
+                if(sk[i].checked==true){
+                    ch=true;
+                }
+            }
+            if(ch==false){
+                document.getElementById("skill_error").innerText="please select your skills";
+                Result=false;
+            }
+            var captcha_error=document.getElementById("captchaInput").value;
+            if(captcha_error==""){
+                document.getElementById("captcha_error").innerText="please enter captcha";
+                Result=false;
+            } else if(captcha_error!=captcha){
+                document.getElementById("captcha_error").innerText="your captch is incorrect";
+                generateCaptcha();
+                document.getElementById("captchaInput").value="";
+                Result=false;
+
+            } else{
+                document.getElementById("captcha_error").innerText="";
+            }
+
+            return Result && dis && ch;
+            
+        }
+
+        
+        function SameAddress(){
+            document.getElementById("userput").value =
+                document.getElementById("use").value;
+
+            document.getElementById("userput").readOnly = true;
+        }
+
+        function notSameAddress(){
+            document.getElementById("userput").readOnly = false;
+            document.getElementById("userput").value = "";
+        }
+    
+
+    </script>
+
+</head>
+<body onload="generateCaptcha()">
+
+
+    <form onsubmit="return validation()" action="link.html">
+
+        <div class="row">
+            <label>Name*</label>
+            <input type="text" id="uname" class="box" onfocus="show_hint(this)" onblur="hide_hint(this)">
+            <span class="hint"></span>
+            <span id="uname_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>Father Name*</label>
+            <input type="text" id="fname" class="box" >
+            <span class="hint" ></span>
+            <span id="fname_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>Mother Name*</label>
+            <input type="text" id="mname" class="box" >
+            <span class="hint" ></span>
+            <span id="mname_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>Mobile Number*</label>
+            <input type="number" id="num" class="box" >
+            <span class="hint" ></span>
+            <span id="num_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>Email*</label>
+            <input type="email" id="uemail"  class="box" >
+            <span class="hint" ></span>
+            <span id="uemail_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>Password*</label>
+            <div class="password-wrapper">
+                <input type="text" id="upas" class="box hidden" onkeyup="pass_key(this.value)">
+                <span class="eye" onclick="eye_click()">👁️</span>
+                <span id="upas_error" style="color: red; margin-left: 10px;"></span>
+            </div>
+
+            <span id="w">Weak</span>
+            <span id="g">Good</span>
+            <span id="s">Strong</span>
+        </div>
+        
+        <div class="row">
+            <label>Gender*</label>
+            <input type="radio" name="gender">Male
+            <input type="radio" name="gender">Female
+            <span id="gender_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>Date*</label>
+            <input type="date" id="date"  class="box">
+            <span id="date_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>Time*</label>
+            <input type="time" id="time" class="box">
+            <span id="time_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>File*</label>
+            <input type="file" id="file" class="box"><span id="file_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>Address*</label>
+            <input type="text" id="use" class="box">
+            <span id="use_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label></label>
+            <input type="radio" name="Address" onclick="SameAddress()"> Yes
+            <input type="radio" name="Address" onclick="notSameAddress()"> No
+        </div>
+
+        <div class="row">
+            <label>Permanent Address</label>
+            <input type="text" id="userput" class="box">
+            <span id="padd_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+        
+        <div class="row">
+            <label> Your Skills *</label>
+            <ul>
+                <input type="checkbox" name="skill">Python</br>
+                <input type="checkbox" name="skill">Javascript</br>
+                <input type="checkbox" name="skill">Css</br>
+                <input type="checkbox" name="skill">Html</br>
+                <input type="checkbox" name="skill">Django</br>
+            </ul>
+            <span id="skill_error" style="color: red; margin-left: 10px;"></span>
+            
+        </div>
+
+        <div class="row">
+            <label>State*</label>
+            <select class="box" id="state">
+                <option value="">Select Your State</option>
+                <option>Maharashtra</option>
+                <option>Madhya Pradesh</option>
+                <option>Chhattisgarh</option>
+                <option>Gujarat</option>
+            </select>
+            <span id="state_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <label>Captcha*</label>
+            <input type="text" id="captchaText" class="box" readonly
+            style="width:140px; font-weight:bold; text-align:center;">
+            <span onclick="generateCaptcha()" style="cursor:pointer; margin-left:10px;">🔄</span>
+            <input type="text" id="captchaInput" class="box"
+            placeholder="Enter captcha" style="width:140px; margin-left:10px;">
+            
+            
+            <span id="captcha_error" style="color: red; margin-left: 10px;"></span>
+        </div>
+
+        <div class="row">
+            <input type="submit" value="SUBMIT">
+        </div>
+
+        
+
+
+    </form>
+
+</body>
+</html>

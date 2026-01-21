@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Perfect Form</title>
+        <style>
+        
+            .border-frame {
+                position: fixed;
+                inset: 0;
+                padding: 70px;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            /* COMMON BULB SETTINGS */
+            .border-frame::before,
+            .border-frame::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+
+                background-repeat:
+                    repeat-x,
+                    repeat-y,
+                    repeat-x,
+                    repeat-y;
+
+                background-size: 25px 25px;
+                animation: moveLights 4s linear infinite;
+            }
+
+            /* IMAGE 1 */
+            .border-frame::before {
+                background-image:
+                    url("bulb.png"),
+                    url("bulb.png"),
+                    url("bulb.png"),
+                    url("bulb.png");
+
+                background-position:
+                    top left,
+                    top right,
+                    bottom left,
+                    top left;
+
+                animation:
+                    moveLights 4s linear infinite,
+                    fade1 2s infinite;
+            }
+
+            /* IMAGE 2 */
+            .border-frame::after {
+                background-image:
+                    url("bulp.jpg"),
+                    url("bulp.jpg"),
+                    url("bulp.jpg"),
+                    url("bulp.jpg");
+
+                background-position:
+                    top left,
+                    top right,
+                    bottom left,
+                    top left;
+
+                animation:
+                    moveLights 4s linear infinite,
+                    fade2 2s infinite;
+            }
+
+            /* MOVE BULBS */
+            @keyframes moveLights {
+                from {
+                    background-position:
+                        0 0,
+                        100% 0,
+                        0 100%,
+                        0 0;
+                }
+                to {
+                    background-position:
+                        200px 0,
+                        100% 200px,
+                        200px 100%,
+                        0 200px;
+                }
+            }
+
+            /* IMAGE SWITCH */
+            @keyframes fade1 {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0; }
+            }
+
+            @keyframes fade2 {
+                0%, 50% { opacity: 0; }
+                51%, 100% { opacity: 1; }
+            }
+
+
+            /* FORM CONTAINER */
+            .form-container {
+                width: 450px;
+                padding: 20px;
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            }
+
+
+            /* input styling (optional but looks better) */
+            .box {
+                padding: 6px;
+                width: 200px;
+                font-size: 14px;
+            }
+
+            .row {
+                margin-bottom: 6px;
+            }
+
+            .hidden {
+                -webkit-text-security: disc;
+            }
+
+            .password-wrapper {
+                display: inline-flex;
+                align-items: center;
+            }
+
+            .eye {
+                cursor: pointer;
+                margin-left: -25px;
+            }
+            .content-area {
+                position: fixed;
+                top: 70px;
+                left: 450px;
+                right: 25px;
+                bottom: 70px;
+
+                z-index: 2;
+                overflow-y: auto;
+
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                padding-top: 20px;
+            }
+            /* LEFT PANEL INSIDE BORDER */
+            .left-panel {
+                position: fixed;
+                top: 80px;          /* border padding ke andar */
+                left: 80px;         /* border padding ke andar */
+                width: 400px;
+                height: 400px;
+
+                background: white;
+                padding: 15px;
+                border-radius: 10px;
+
+                box-shadow: 0 0 8px rgba(0,0,0,0.2);
+                z-index: 2;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            /* IMAGE */
+            .left-panel img {
+                width: 70%;
+                height: 70%;
+                object-fit: contain;
+                margin-bottom: 15px;
+            }
+
+            /* TIMER */
+            .timer {
+                font-size: 28px;
+                font-weight: bold;
+                color: #222;
+            }
+            .hint {
+                color: #8400ff;
+                font-size: 13px;
+                margin-left: 10px;
+                display: none;
+            }
+
+            /* Strength colors */
+            #w { color: red; display: none; margin-left: 10px; }
+            #g { color: orange; display: none; margin-left: 10px; }
+            #s { color: green; display: none; margin-left: 10px; }
+            
+        </style>
+        <script>
+            function show_hint(input){
+                var mgs=input.nextElementSibling;
+                if(input.value.trim()==""){
+                    mgs.style.display="inline";
+                }
+            }
+            function hide_hint(input){
+                var mgs=input.nextElementSibling;
+                if(input.value.trim()!=""){
+                    mgs.style.display="none";
+                }
+            }
+            function clearError(inputId, errorId){
+                var input=document.getElementById(inputId);
+                var error=document.getElementById(errorId);
+                if(input.value.trim()!=""){
+                    error.innerText="";
+                }
+            }
+            function validateNumber(input){
+                var value=input.value;
+                if(/[^0-9]/.test(value)){
+                    input.value = value.replace(/[^0-9]/g,"");
+                    document.getElementById("num_error").innerText="Alphabets are not allowed";
+                }else{
+                    document.getElementById("num_error").innerText="";
+                }
+            }
+
+            var captcha="";
+            function generateCaptcha(){
+            var cap="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+            captcha="";
+            for(var i=0;i<6;i++){
+                var random= Math.floor(Math.random() * cap.length);
+                captcha+=cap[random];
+
+            }
+            document.getElementById("captchaText").value=captcha;
+        }
+    
+        function pass_key(DATA){
+                var eight=RegExp('(?=.{8,})');
+                var upper=RegExp('(?=.*[A-Z])');
+                var lower=RegExp('(?=.*[a-z])');
+                var number=RegExp('(?=.*[0-9])');
+                var special=RegExp('(?=.*[!@#$%^&*])');
+                var manage=[eight,upper,lower,number,special];
+                var show=0;
+                for(var i=0;i<manage.length;i++){
+                    if(manage[i].test(DATA)){
+                        show++ ;
+                    }
+                }
+
+                document.getElementById("w").style.display = "none";
+                document.getElementById("g").style.display = "none";
+                document.getElementById("s").style.display = "none";
+
+                if(show <= 2) {
+                    document.getElementById("w").style.display = "inline";
+                }
+                else if(show <= 4){
+                    document.getElementById("g").style.display = "inline";
+                } 
+                else document.getElementById("s").style.display = "inline";
+            }
+
+  
+        let show = false;
+        function eye_click(){
+            let p = document.getElementById("upas");
+            if(show){
+                p.classList.add("hidden"); 
+            } else {
+                p.classList.remove("hidden"); 
+            }
+            show = !show;
+        }
+        function validation(){
+            var uname=document.getElementById("uname").value;
+            Result=true;
+            if(uname==""){
+                document.getElementById("uname_error").innerText="Please fill your name";
+                Result=false;
+            }
+            var Fname=document.getElementById("fname").value;
+            if(Fname==""){
+                document.getElementById("fname_error").innerText="please fill your father name";
+                Result=false;
+            }
+            var Mname=document.getElementById("mname").value;
+            if(Mname==""){
+                document.getElementById("mname_error").innerText="please fill your mother name";
+                Result=false;
+            }
+            var Uemail=document.getElementById("uemail").value;
+            if(Uemail==""){
+                document.getElementById("uemail_error").innerText="please fill your email";
+                Result=false;
+            }
+            var Upass=document.getElementById("upas").value;
+            if(Upass==""){
+                document.getElementById("upas_error").innerText="please fill your password";
+                Result=false;
+            }
+            var Mobile=document.getElementById("num").value;
+            if(Mobile==""){
+                document.getElementById("num_error").innerText="please fill your Mobile number";
+                Result=false;
+            }
+            var Date=document.getElementById("date").value;
+            if(Date==""){
+                document.getElementById("date_error").innerText="please fill date";
+                Result=false;
+            }
+            var Time=document.getElementById("time").value;
+            if(Time==""){
+                document.getElementById("time_error").innerText="please fill the time";
+                Result=false;
+            }
+            var File=document.getElementById("file").value;
+            if(File==""){
+                document.getElementById("file_error").innerText="please fill the file";
+                Result=false;
+            }
+            var Add=document.getElementById("use").value;
+            if(Add==""){
+                document.getElementById("use_error").innerText="please fill the address";
+                Result=false;
+            }
+            var P=document.getElementById("userput").value;
+            if(P==""){
+                document.getElementById("padd_error").innerText="please fill perment address";
+                Result=false;
+            }
+            var State=document.getElementById("state").value;
+            if(State==""){
+                document.getElementById("state_error").innerText="please select state";
+                Result=false;
+            }
+            var dis=false;
+            var G=document.getElementsByName("gender").length;
+            var Gender=document.getElementsByName("gender");
+            for(var i=0;i<G;i++){
+                if(Gender[i].checked==true){
+                    dis=true;
+                }
+            }
+            if(dis==false){
+                document.getElementById("gender_error").innerText="please select your gender";
+                Result=false;
+            }
+            var ch=false;
+            var countcheck=document.getElementsByName("skill").length;
+            var sk=document.getElementsByName("skill");
+            for (var i=0; i<countcheck;i++){
+                if(sk[i].checked==true){
+                    ch=true;
+                }
+            }
+            if(ch==false){
+                document.getElementById("skill_error").innerText="please select your skills";
+                Result=false;
+            }
+            var captcha_error=document.getElementById("captchaInput").value;
+            if(captcha_error==""){
+                document.getElementById("captcha_error").innerText="please enter captcha";
+                Result=false;
+            } else if(captcha_error!=captcha){
+                document.getElementById("captcha_error").innerText="your captch is incorrect";
+                generateCaptcha();
+                document.getElementById("captchaInput").value="";
+                Result=false;
+
+            } else{
+                document.getElementById("captcha_error").innerText="";
+            }
+
+            return Result && dis && ch;
+            
+        }
+
+        
+        function SameAddress(){
+            document.getElementById("userput").value =
+                document.getElementById("use").value;
+
+            document.getElementById("userput").readOnly = true;
+        }
+
+        function notSameAddress(){
+            document.getElementById("userput").readOnly = false;
+            document.getElementById("userput").value = "";
+        }
+        function validateAlphabet(input,errorId){
+            var value=input.value;
+            if(/[^a-zA-A-Z\s]/.test(value)){
+                input.value=value.replace(/[^a-zA-A-Z\s]/g,"");
+                document.getElementById(errorId).innerText="Please enter alphabet only";
+            }else{
+                document.getElementById(errorId).innerText="";
+            }
+        }
+        function checkFormComplete(){
+            var isValid=true;
+            var require_input=["uname","fname","mname","num","uemail","upas","date","time","use","userput","captchaInput"];
+            require_input.forEach(id => { var el=document.getElementById(id);
+                if(!el || el.value.trim()==""){
+                    isValid=false;
+                }
+            });
+            var gender_check=false;
+            document.getElementsByName("gender").forEach(g=>{
+                if(g.checked) gender_check=true;
+            });
+            if(!gender_check) isValid=false;
+
+
+            if(document.getElementById("state").value==""){
+                isValid=false;
+            }
+            if(document.getElementById("captchaInput").value != captcha){
+                isValid=false;
+            }
+
+            document.getElementById("submitBtn").disabled=!isValid;
+        }   
+    </script>
+    </head>
+
+    <body onload="generateCaptcha()">
+        <div class="border-frame"></div>
+         <div class="left-panel">
+                <img src="bird-8788491_1280.jpg" alt="Form Image" height="500px" width="500px"><br><br>
+                <div class="timer" id="timer">10:00</div><br><br>
+                <div>Time remaining</div>
+            </div>
+
+        <div class="content-area">
+            <div class="form-container">
+                    <form onsubmit="return validation()" action="link.html" id="form">
+
+                        <div class="row">
+                            <label>Name*</label>
+                            <input type="text" id="uname" class="box" onfocus="show_hint(this)" oninput="hide_hint(this);
+                            clearError('uname','uname_error'); validateAlphabet(this,'uname_error'); checkFormComplete()">
+                            <span class="hint">Please fill your name</span>
+                            <span id="uname_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>Father Name*</label>
+                            <input type="text" id="fname" class="box" onfocus="show_hint(this)" oninput="hide_hint(this); 
+                            clearError('fname','fname_error'); validateAlphabet(this,'fname_error'); checkFormComplete()">
+                            <span class="hint" >Please fill father name</span>
+                            <span id="fname_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>Mother Name*</label>
+                            <input type="text" id="mname" class="box" onfocus="show_hint(this)" oninput="hide_hint(this);
+                            clearError('mname','mname_error'); validateAlphabet(this,'mname_error'); checkFormComplete()" >
+                            <span class="hint" >Please fill mother name</span>
+                            <span id="mname_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>Mobile Number*</label>
+                            <input type="text" id="num" class="box" onfocus="show_hint(this)" oninput="hide_hint(this);
+                            clearError('num','num_error'); validateNumber(this); checkFormComplete()" maxlength="10" >
+                            <span class="hint" >Please enter mobile number</span>
+                            <span id="num_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>Email*</label>
+                            <input type="email" id="uemail"  class="box" onfocus="show_hint(this)" oninput="hide_hint(this);
+                            clearError('uemail','uemail_error'); checkFormComplete()">
+                            <span class="hint" >Please enter email</span>
+                            <span id="uemail_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>Password*</label>
+                            <div class="password-wrapper">
+                                <input type="text" id="upas" class="box hidden" onkeyup="pass_key(this.value);
+                                clearError('upas','upas_error'); checkFormComplete()">
+                                <span class="eye" onclick="eye_click()">👁️</span><br>
+                                <span id="upas_error" style="color: red; margin-left: 10px;"></span>
+                                
+                            </div><br>
+                            <span id="w">Weak</span>
+                            <span id="g">Good</span>
+                            <span id="s">Strong</span>
+                        </div>
+                        <div>
+                            <p>• One uppercase letter</p>
+                            <p>• One lowercase letter</p>
+                            <p>• At least 8 characters</p>
+                            <p>• One special character</p>
+                            <p>• One number</p>
+                        </div><br>
+
+                        
+                        <div class="row">
+                            <label>Gender*</label>
+                            <input type="radio" name="gender" onclick= "document.getElementById('gender_error').innerText=''; checkFormComplete()">Male
+                            <input type="radio" name="gender" onclick="document.getElementById('gender_error').innerText=''; checkFormComplete()">Female
+                            <span id="gender_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>Date*</label>
+                            <input type="date" id="date"  class="box" oninput="clearError('date','date_error'); checkFormComplete()">
+                            <span id="date_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>Time*</label>
+                            <input type="time" id="time" class="box" oninput="clearError('time','time_error'); checkFormComplete()">
+                            <span id="time_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>File*</label>
+                            <input type="file" id="file" class="box" oninput="clearError('file','file_error')">
+                            <span id="file_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>Address*</label>
+                            <input type="text" id="use" class="box" oninput="clearError('use','use_error'); validateAlphabet(this,'use_error'); checkFormComplete()">
+                            <span id="use_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label></label>
+                            <input type="radio" name="Address" onclick="SameAddress(); checkFormComplete()"> Yes
+                            <input type="radio" name="Address" onclick="notSameAddress(); checkFormComplete()"> No
+                        </div><br>
+
+                        <div class="row">
+                            <label>Permanent Address</label>
+                            <input type="text" id="userput" class="box" oninput="clearError('userput','padd_error');validateAlphabet(this,'padd_error'); checkFormComplete()">
+                            <span id="padd_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+                        
+                        <div class="row">
+                            <label> Your Skills *</label>
+                            <ul>
+                                <input type="checkbox" name="skill" onclick="document.getElementById('skill_error').innerText=''">Python</br>
+                                <input type="checkbox" name="skill" onclick="document.getElementById('skill_error').innerText=''">Javascript</br>
+                                <input type="checkbox" name="skill" onclick="document.getElementById('skill_error').innerText=''">Css</br>
+                                <input type="checkbox" name="skill" onclick="document.getElementById('skill_error').innerText=''">Html</br>
+                                <input type="checkbox" name="skill" onclick="document.getElementById('skill_error').innerText=''">Django</br>
+                            </ul>
+                            <span id="skill_error" style="color: red; margin-left: 10px;"></span>
+                            
+                        </div><br>
+
+                        <div class="row">
+                            <label>State*</label>
+                            <select class="box" id="state" onchange="clearError('state','state_error'); checkFormComplete()">
+                                <option value="">Select Your State</option>
+                                <option>Maharashtra</option>
+                                <option>Madhya Pradesh</option>
+                                <option>Chhattisgarh</option>
+                                <option>Gujarat</option>
+                            </select>
+                            <span id="state_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <label>Captcha*</label>
+                            <input type="text" id="captchaText" class="box" readonly
+                            style="width:140px; font-weight:bold; text-align:center;" oninput="clearError('captchaText','captcha_error')">
+                            <span onclick="generateCaptcha()" style="cursor:pointer; margin-left:10px;">🔄</span>
+                            <input type="text" id="captchaInput" class="box" oninput="checkFormComplete()"
+                            placeholder="Enter captcha" style="width:140px; margin-left:10px;">
+                            
+                            
+                            <span id="captcha_error" style="color: red; margin-left: 10px;"></span>
+                        </div><br>
+
+                        <div class="row">
+                            <input type="submit" id="submitBtn" value="SUBMIT" disabled>
+                        </div>
+
+                        
+
+
+                    </form>
+            </div>
+        </div>
+
+        <script>
+            var total_second=10*60;
+            var timer_element=document.getElementById("timer");
+            var time_interval= setInterval(()=>{
+            var minute = Math.floor(total_second/60);
+            var second = total_second % 60;
+            timer_element.textContent=String(minute).padStart(2,"0") + ":" +String(second).padStart(2,"0");
+            total_second--;
+            if(total_second<0){
+                clearInterval(time_interval);
+                timer_element.textContent = "00:00";
+                alert("Time is up!");
+                var form=document.getElementById("form");
+                if(form){
+                    form.querySelectorAll("input, select, textarea, button").forEach(el => el.disabled = true); {
+                        
+                    };
+                }
+            }
+        },1000);
+        </script>
+        
+ 
+    </body>
+
+            
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Payment Receipt</title>
+            <style>
+                body{
+                    background:#e0e0e0;
+                    font-family: "Courier New", monospace;
+                }
+
+                /* RECEIPT PAPER */
+                .receipt{
+                    width:360px;
+                    margin:30px auto;
+                    background:#fff;
+                    padding:18px;
+                    border:1px solid #000;
+                }
+
+                /* HEADER */
+                .header{
+                    text-align:center;
+                    margin-bottom:10px;
+                }
+
+                .header h1{
+                    font-size:20px;
+                    margin:0;
+                }
+
+            .header h2{
+                font-size:13px;
+                font-weight:normal;
+                margin:4px 0;
+            }
+
+            /* RECEIPT TITLE */
+            .receipt-title{
+                text-align:center;
+                font-size:16px;
+                font-weight:bold;
+                margin:10px 0;
+                border-top:1px solid #000;
+                border-bottom:1px solid #000;
+                padding:5px 0;
+            }
+
+            /* FORM ROWS */
+            .row{
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin:6px 0;
+                font-size:14px;
+            }
+
+            .row label{
+                width:45%;
+            }
+
+            .row input{
+                width:52%;
+                border:none;
+                border-bottom:1px solid #000;
+                font-family:"Courier New", monospace;
+                font-size:14px;
+                outline:none;
+            }
+
+            /* TABLE */
+            table{
+                width:100%;
+                border-collapse:collapse;
+                margin-top:10px;
+                font-size:14px;
+            }
+
+            table th{
+                border-bottom:1px solid #000;
+                padding:6px 0;
+                text-align:left;
+            }
+
+            table td{
+                padding:6px 0;
+            }
+
+            table input,
+            table select{
+                width:100%;
+                border:none;
+                border-bottom:1px solid #000;
+                font-family:"Courier New", monospace;
+                font-size:14px;
+                outline:none;
+                background:none;
+            }
+
+            /* TOTAL ROW */
+            .total td{
+                border-top:1px solid #000;
+                font-weight:bold;
+                padding-top:8px;
+            }
+
+            /* BUTTON */
+            .btn-area{
+                margin-top:12px;
+                text-align:center;
+            }
+
+            .btn-area button{
+                padding:6px 14px;
+                background:#000;
+                color:#fff;
+                border:none;
+                cursor:pointer;
+                font-size:14px;
+            }
+
+            /* PRINT ONLY RECEIPT */
+            @media print{
+                body{
+                    background:none;
+                }
+                .btn-area{
+                    display:none;
+                }
+            } 
+        </style>
+        <script>
+            var gst=18;
+            function setCourseFee(){
+                var course=document.getElementById("course");
+                var feeinput=document.getElementById("fee");
+
+                if(course.value==""){
+                    feeinput="";
+                    clearAll();
+                    return;
+                }
+                feeinput.value=course.value;
+                calculateGST();
+            }
+            function calculateGST(){
+                var fee=parseFloat(document.getElementById("fee").value);
+                var gstamt=(fee*gst)/100;
+                var cgst=gstamt/2;
+                var sgst=gstamt/2;
+                document.getElementById("gst").value=gstamt.toFixed(2);
+                document.getElementById("cgst").value=cgst.toFixed(2);
+                document.getElementById("sgst").value=sgst.toFixed(2);
+                var total=fee+gstamt;
+                document.getElementById("total").value=total.toFixed(2);
+
+            }
+            function clearAll(){
+                document.getElementById("gst").value = "";
+                document.getElementById("cgst").value = "";
+                document.getElementById("sgst").value = "";
+                document.getElementById("total").value = "";
+            }
+            function applyRandomDiscount(){
+                var fee=parseFloat(document.getElementById("fee").value);
+                if(fee==0){
+                    alert("Select course first");
+                    return;
+                }
+                var random_discount=Math.floor(Math.random()*(20-5+1))+5;
+                document.getElementById("discount").value=random_discount+"%";
+                var gst_amt=(fee*gst)/100;
+                var total_amt=gst_amt+fee;
+                var discount=(total_amt*random_discount)/100;
+                var final_amt=total_amt-discount;
+                document.getElementById("total").value=final_amt.toFixed(2);
+            }
+
+        </script>
+    </head>
+    <body>
+        <div class="receipt">
+            <div class="header">
+                <h1>ABC INSTITUDE</h1>
+                <h2>indore(m.p).ph.8852697410</h2>
+            </div>
+            <div class="receipt-title">Receipt</div>
+            <div class="row">
+                <label>Date : </label>
+                <input type="date">
+            </div>
+            <div class="row">
+                <label>Name of Student : </label>
+                <input type="text" placeholder="enter the student name">
+            </div>
+            <table>
+                <tr>
+                    <th>Course offered by Institude</th>
+                    <th>Course Fee</th>
+                </tr>
+                <tr> 
+                    <td>
+                        <select id="course" onchange="setCourseFee()">
+                            <option value="">Select Course</option>
+                            <option value="200000">Python</option>
+                            <option value="400000">Django</option>
+                            <option value="600000">web Development</option>
+                        </select>
+                    </td>  
+                </tr>
+                <tr> 
+                    <td>Pay Fee</td>
+                    <td><input type="number" id="fee" placeholder="enter the amount" oninput="calculateGST()"></td>
+                </tr>
+                <tr>
+                    <td>GST Include</td>
+                    <td><input type="text" id="gst" readonly></td>
+                </tr>
+                <tr>
+                    <td>CGST (%)</td>
+                    <td><input type="text" id="cgst" readonly></td>
+                </tr>
+                <tr>
+                    <td>SGST (%)</td>
+                    <td><input type="text" id="sgst" readonly></td>
+                </tr>
+                <tr>
+                    <td>Discount (%)</td>
+                    <td>
+                        <input type="text" id="discount" readonly><br>
+                        <button type="button" onclick="applyRandomDiscount()">Apply</button>
+                    </td>
+                </tr>
+
+                <tr class="total">
+                    <td>Total Fee Including Tax</td>
+                    <td><input type="text" id="total" readonly></td>
+                </tr>
+            </table>
+            <div class="btn-area">
+                <button onclick="window.print()">Print Receipt</button>
+            </div>
+        </div>
+
+        
+    </body>
+</html>

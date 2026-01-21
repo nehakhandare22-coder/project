@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Unit Convert</title>
+        <style>
+            .hidden {
+                -webkit-text-security: disc;
+                
+            }
+            .hidden.eye{
+                position: absolute;
+                right: 12px;
+                top: 25%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                font-size: 20px;
+            }
+            .title {
+                display: inline-block;
+                width: 150px;      /* controls perfect alignment */
+                font-size: 18px;
+            }
+            .box {
+               width: 300px;
+               height: 30px;
+               padding: 5px 10px;
+               font-size: 16px;
+               border: 1px solid gray;
+               border-radius: 5px;
+            }
+            .hidden{
+                width: 300px;
+               height: 30px;
+               padding: 5px 10px;
+               font-size: 16px;
+               border: 1px solid gray;
+               border-radius: 5px;
+
+            }
+            .eye {
+                margin-left: -30px;
+                cursor: pointer;
+                position: relative;
+                top: 2px;
+            }
+        </style>
+        <script>
+            function SameAddress(){
+                var a=document.getElementById("use").value;
+                document.getElementById("userput").value=a;
+                document.getElementById("userput").readOnly=true;
+            }
+            function notSameAddress(){
+                var b=document.getElementById("userput").value;
+                document.getElementById("userput").value="";
+            }
+            function pass_key(DATA){
+                var eight=RegExp('(?=.{8,})');
+                var upper=RegExp('(?=.*[A-Z])');
+                var lower=RegExp('(?=.*[a-z])');
+                var number=RegExp('(?=.*[0-9])');
+                var special=RegExp('(?=.*[!@#$%^&*])');
+                var manage=[eight,upper,lower,number,special];
+                var show=0;
+                for(var i=0;i<manage.length;i++){
+                    if(manage[i].test(DATA)){
+                        show++ ;
+                    }
+                }
+                document.getElementById("w").style.display="none";
+                document.getElementById("g").style.display="none";
+                document.getElementById("s").style.display="none";   
+                if(show<=2){
+                    document.getElementById("w").style.display="inline";
+                } else if(show<=4){
+                    document.getElementById("g").style.display="inline";
+                
+                } else{
+                    document.getElementById("s").style.display="inline";
+                }
+            }
+                var s=false;
+                function eye_click(){
+                    var h=document.getElementById("upas");
+                    if(s){
+                        h.classList.add("hidden");
+                    }
+                    else{
+                        h.classList.remove("hidden");
+                    }
+                    s=!s;
+                }
+            
+
+        </script>
+    </head>
+    <body>
+        <form onsubmit="return_validation()" action="C:\Users\SUMIT KHADSE\Desktop\js\bulp_pics\calci.html">
+            Name<span class="title">*</span>:- <input type="text" id="uname" class="box">
+            <span id="uname_error"></span><br><br>
+            Father Name<span class="title">*</span>:- <input type="text" id="fname" class="box">
+            <span id="fname_error"></span><br><br>
+            Mother Name<span class="title">*</span>:- <input type="text" id="mname" class="box">
+            <span id="mname_error"></span><br><br>
+            Email<span class="title">*</span>:- <input type="email" id="uemail" class="box">
+            <span id="uemail_error"></span><br><br>
+            Password<span class="title">*</span>:- <input type="text" id="upas" class="hidden" onkeyup="pass_key(this.value)">
+            <span class="eye" onclick="eye_click()">👁️</span>
+            <span id="w" style="display: none; color: red;" >Weak</span>
+            <span id="g" style="display: none; color:orange ;">Good</span>
+            <span id="s" style="display: none; color: green;">Strong</span>
+            <span id="upas_error"></span><br><br>
+            Date<span class="title">*</span>:- <input type="date" id="date" class="box">
+            <span id="date_error"></span><br><br>
+            Time<span class="title">*</span>:- <input type="time" id="time" class="box"><span id="time_error"></span><br><br>
+            File<span class="title">*</span>:- <input type="file" id="file" class="box"><span id="file_error"></span><br><br>
+            Address<span class="title">*</span>:- <input type="text" id="use" class="box"></br>
+            <input type="radio" name="Address" onclick="SameAddress()">Yes
+            <input type="radio" name="Address" onclick="notSameAddress()">No</br>
+            Permanent Address:- <input type="text" id="userput" class="box"><br><br>
+            State<span class="title">*</span>:- <select id="state" class="box">
+                <option value="">Select Your State</option>
+                <option value="mh">Maharastra</option>
+                <option value="mp">Madhya Pradesh</option>
+                <option value="cg">Chattisgard</option>
+                <option value="guj">Gujrat</option>
+            </select>
+        </form>    
+    </body>
+</html>
