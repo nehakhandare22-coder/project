@@ -106,11 +106,6 @@
             }
 
             /* BUTTON */
-            .btn-area{
-                margin-top:12px;
-                text-align:center;
-            }
-
             .btn-area button{
                 padding:6px 14px;
                 background:#000;
@@ -118,17 +113,39 @@
                 border:none;
                 cursor:pointer;
                 font-size:14px;
+                transition:0.3s;
             }
 
-            /* PRINT ONLY RECEIPT */
-            @media print{
-                body{
-                    background:none;
-                }
-                .btn-area{
-                    display:none;
-                }
-            } 
+            /* DISABLED STATE */
+            .btn-area button:disabled{
+                background:#777;
+                color:#ddd;
+                cursor:not-allowed;
+                opacity:0.6;
+            }
+
+            /* ENABLED HOVER */
+            .btn-area button:not(:disabled):hover{
+                background:#333;
+            }
+            /* default disabled */
+            input:disabled, select:disabled{
+                background:#f2f2f2;
+                cursor:not-allowed;
+            }
+
+            /* ACTIVE (just enabled) */
+            .active-field{
+                background:#e8ffe8;
+                border-bottom:2px solid #2ecc71 !important;
+            }
+
+            input:not(:disabled):not(.active-field),
+            select:not(:disabled):not(.active-field){
+                background:#fff;
+            }
+
+
         </style>
         <script>
             var gst=18;
@@ -138,24 +155,30 @@
 
                 if(course.value==""){
                     feeinput="";
+                    document.getElementById("discount").value = "";
+                    document.getElementById("discountBtn").disabled = true;
                     clearAll();
+                    disableAfter("course");
                     return;
                 }
                 feeinput.value=course.value;
-                calculateGST();
+                onFeeChange();
             }
             function calculateGST(){
-                var fee=parseFloat(document.getElementById("fee").value);
-                var gstamt=(fee*gst)/100;
-                var cgst=gstamt/2;
-                var sgst=gstamt/2;
-                document.getElementById("gst").value=gstamt.toFixed(2);
-                document.getElementById("cgst").value=cgst.toFixed(2);
-                document.getElementById("sgst").value=sgst.toFixed(2);
-                var total=fee+gstamt;
-                document.getElementById("total").value=total.toFixed(2);
+                const fee = Number(document.getElementById("fee").value);
+                if(!fee) return;
 
+                const gstamt = (fee * gst) / 100;
+                const cgst = gstamt / 2;
+                const sgst = gstamt / 2;
+
+                document.getElementById("gst").value = gstamt.toFixed(2);
+                document.getElementById("cgst").value = cgst.toFixed(2);
+                document.getElementById("sgst").value = sgst.toFixed(2);
+                document.getElementById("total").value = (fee + gstamt).toFixed(2);
             }
+
+
             function clearAll(){
                 document.getElementById("gst").value = "";
                 document.getElementById("cgst").value = "";
@@ -176,6 +199,85 @@
                 var final_amt=total_amt-discount;
                 document.getElementById("total").value=final_amt.toFixed(2);
             }
+            
+            function checkAllFilled(){
+                const printBtn = document.getElementById("printBtn");
+                const date = document.getElementById("date").value;
+                const name = document.getElementById("name").value;
+                const course = document.getElementById("course").value;
+                const fee = document.getElementById("fee").value;
+                const total = document.getElementById("total").value;
+
+                printBtn.disabled = !(date && name && course && fee && total);
+            }
+
+
+            const fieldFlow = [
+                "date",
+                "name",
+                "course",
+                "fee",
+                
+            ];
+
+            function handleFlow(currentId, nextId){
+                const current = document.getElementById(currentId);
+                const next = document.getElementById(nextId);
+
+                if(current.value !== ""){
+                    next.disabled = false;
+
+                    document.querySelectorAll(".active-field")
+                        .forEach(el => el.classList.remove("active-field"));
+
+                    next.classList.add("active-field");
+                    next.focus();
+                }else{
+                    disableAfter(currentId);
+                    clearAll();
+                    document.getElementById("discountBtn").disabled = true;
+                }
+
+                checkAllFilled();
+            }
+
+
+
+            function disableAfter(currentId){
+                let lock = false;
+
+                fieldFlow.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(!el) return;
+
+                    if(lock){
+                        el.disabled = true;
+                        el.value = "";
+                        el.classList.remove("active-field");
+                    }
+
+                    if(id === currentId){
+                        lock = true;
+                    }
+                });
+            }
+            function onFeeChange(){
+                const feeInput = document.getElementById("fee");
+                const discountBtn = document.getElementById("discountBtn");
+
+                if(feeInput.value && Number(feeInput.value) > 0){
+                    calculateGST();
+                    discountBtn.disabled = false;
+                }else{
+                    discountBtn.disabled = true;
+                    document.getElementById("discount").value = "";
+                    clearAll();
+                    disableAfter("fee");
+                }
+
+                checkAllFilled();
+            }
+
 
         </script>
     </head>
@@ -188,11 +290,11 @@
             <div class="receipt-title">Receipt</div>
             <div class="row">
                 <label>Date : </label>
-                <input type="date">
+                <input type="date" id="date" onchange= "handleFlow('date','name')">
             </div>
             <div class="row">
                 <label>Name of Student : </label>
-                <input type="text" placeholder="enter the student name">
+                <input type="text" id="name" placeholder="enter the student name" disabled oninput="handleFlow('name','course')">
             </div>
             <table>
                 <tr>
@@ -201,7 +303,7 @@
                 </tr>
                 <tr> 
                     <td>
-                        <select id="course" onchange="setCourseFee()">
+                        <select id="course" disabled onchange="setCourseFee(); handleFlow('course','fee')">
                             <option value="">Select Course</option>
                             <option value="200000">Python</option>
                             <option value="400000">Django</option>
@@ -211,7 +313,8 @@
                 </tr>
                 <tr> 
                     <td>Pay Fee</td>
-                    <td><input type="number" id="fee" placeholder="enter the amount" oninput="calculateGST()"></td>
+                    <td><input type="number" id="fee" placeholder="enter the amount" disabled oninput="onFeeChange()"
+                    ></td>
                 </tr>
                 <tr>
                     <td>GST Include</td>
@@ -229,7 +332,7 @@
                     <td>Discount (%)</td>
                     <td>
                         <input type="text" id="discount" readonly><br>
-                        <button type="button" onclick="applyRandomDiscount()">Apply</button>
+                        <button type="button" id="discountBtn" disabled onclick="applyRandomDiscount(); checkAllFilled()">Apply</button>
                     </td>
                 </tr>
 
@@ -239,7 +342,7 @@
                 </tr>
             </table>
             <div class="btn-area">
-                <button onclick="window.print()">Print Receipt</button>
+                <button id="printBtn" disabled onclick="window.print()">Print Receipt</button>
             </div>
         </div>
 
