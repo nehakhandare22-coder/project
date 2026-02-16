@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Recharge</title>
+        <style>
+            * {
+                box-sizing: border-box;
+                font-family: Arial, sans-serif;
+            }
+
+            body {
+                background: linear-gradient(135deg, pink, pink
+                );
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+
+            .container {
+                background: #fff;
+                padding: 30px;
+                width: 350px;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            }
+
+            label {
+                font-size: 14px;
+                font-weight: bold;
+                display: block;
+                margin-top: 15px;
+                margin-bottom: 5px;
+            }
+
+            .recha input,
+            .recha select {
+                width: 100%;
+                padding: 10px;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                font-size: 14px;
+            }
+
+            input:disabled,
+            select:disabled {
+                background: #f2f2f2;
+                cursor: not-allowed;
+            }
+
+            #gst {
+                background: #e8f5e9;
+                font-weight: bold;
+                color: #2e7d32;
+            }
+
+            button {
+                width: 100%;
+                margin-top: 20px;
+                padding: 10px;
+                border: none;
+                border-radius: 6px;
+                background: #4e73df;
+                color: white;
+                font-size: 15px;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+
+            button:disabled {
+                background: #aaa;
+                cursor: not-allowed;
+            }
+
+            button:hover:not(:disabled) {
+                background: #2e59d9;
+            }
+
+            .payment-options {
+                margin-top: 15px;
+                display: none;
+            }
+
+            *
+            .payment-options select {
+                margin-top: 8px;
+            }
+            #summary {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f8f9ff;
+                border: 1px solid #dcdfff;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+                animation: fadeIn 0.4s ease-in-out;
+            }
+
+            #summary h4 {
+                margin-bottom: 10px;
+                color: #4e73df;
+                text-align: center;
+            }
+
+            #summary p {
+                font-size: 14px;
+                margin: 6px 0;
+                padding: 6px;
+                background: white;
+                border-radius: 5px;
+                border-left: 4px solid #4e73df;
+            }
+            .receipt-box {
+                margin-top: 20px;
+                padding: 20px;
+                background: #ffffff;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                animation: fadePop 0.4s ease-in-out;
+                border-top: 5px solid #4CAF50;
+            }
+
+            .receipt-box h3 {
+                text-align: center;
+                color: #2e7d32;
+                margin-bottom: 15px;
+            }
+
+            .receipt-box p {
+                font-size: 14px;
+                margin: 6px 0;
+                padding: 8px;
+                background: #f9f9f9;
+                border-radius: 6px;
+            }
+
+            @keyframes fadePop {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+
+    </style>
+    </head>
+    <body>
+        <div class="container">
+            <label>Customer Name</label>
+            <div class="recha">
+                <input type="text" id="name" />
+            </div>
+            <label>Mobile Number</label>
+            <div class="recha">
+                <input type="number" id="mobile" disabled/>
+            </div>
+            <label>Recharge Plan</label>
+            <div class="recha">
+                <select id="plan" disabled>
+                    <option value="">Select Plan</option>
+                    <option value="255">rs 255 - 14days</option>
+                    <option value="500">rs 500 - 28days</option>
+                </select>
+            </div>
+            <div class="recha">
+                <label>Total Amount With 18% GST</label>
+                <input type="number" id="gst" disabled/>
+            </div>
+            <button id="open" disabled>Payment Mode</button>
+            <div id="finalReceipt" style="display:none;">
+                <div class="receipt-box">
+                    <h3>🎉 Recharge Successful</h3>
+                    <p id="rName"></p>
+                    <p id="rMobile"></p>
+                    <p id="rPlan"></p>
+                    <p id="rAmount"></p>
+                    <p id="rPayment"></p>
+                    <p id="rDate"></p>
+                    <p id="rTime"></p>
+                    <p id="rValid"></p>
+                </div>
+            </div>
+
+        </div>
+        <div class="payment-options" id="paymentSection">
+            <label>Select Payment Method</label>
+            <div class="recha">
+                <select id="paymentMethod">
+                    <option value="">Select Method</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card">Debit/Credit Card</option>
+                    <option value="Net Banking">Net Banking</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="summary" style="margin-top:15px; display:none;">
+            <h4>Recharge Details</h4>
+            <p id="showName"></p>
+            <p id="showMobile"></p>
+            <p id="showPlan"></p>
+            <p id="showAmount"></p>
+        </div>
+        <script>
+            const nameInput = document.getElementById("name");
+            const mobileInput = document.getElementById("mobile");
+            const planSelect = document.getElementById("plan");
+            const gstInput = document.getElementById("gst");
+            const paymentBtn = document.getElementById("open");
+
+            const paymentSection = document.getElementById("paymentSection");
+            const paymentMethod = document.getElementById("paymentMethod");
+
+            const summary = document.getElementById("summary");
+            const showName = document.getElementById("showName");
+            const showMobile = document.getElementById("showMobile");
+            const showPlan = document.getElementById("showPlan");
+            const showAmount = document.getElementById("showAmount");
+
+    // Enable Mobile
+            nameInput.addEventListener("input", function () {
+                mobileInput.disabled = nameInput.value.trim() === "";
+            });
+
+            // Enable Plan
+            mobileInput.addEventListener("input", function () {
+                planSelect.disabled = mobileInput.value.length !== 10;
+            });
+
+    // Calculate GST and Enable Payment Button
+            planSelect.addEventListener("change", function () {
+                if (planSelect.value !== "") {
+                    let amount = parseFloat(planSelect.value);
+                    let total = amount + (amount * 0.18);
+                    gstInput.value = total.toFixed(2);
+                    paymentBtn.disabled = false;
+                } else {
+                    gstInput.value = "";
+                    paymentBtn.disabled = true;
+                }
+            });
+
+    // Show Payment Section + Summary
+            paymentBtn.addEventListener("click", function () {
+                paymentSection.style.display = "block";
+                summary.style.display = "block";
+
+                showName.textContent = "Name: " + nameInput.value;
+                showMobile.textContent = "Mobile: " + mobileInput.value;
+                showPlan.textContent = "Selected Plan: ₹" + planSelect.value;
+                showAmount.textContent = "Total Amount (with GST): ₹" + gstInput.value;
+            });
+
+    // After selecting payment method
+            const finalReceipt = document.getElementById("finalReceipt");
+
+            const rName = document.getElementById("rName");
+            const rMobile = document.getElementById("rMobile");
+            const rPlan = document.getElementById("rPlan");
+            const rAmount = document.getElementById("rAmount");
+            const rPayment = document.getElementById("rPayment");
+            const rDate = document.getElementById("rDate");
+            const rTime = document.getElementById("rTime");
+            const rValid = document.getElementById("rValid");
+
+            paymentMethod.addEventListener("change", function () {
+                if (paymentMethod.value !== "") {
+
+                    let now = new Date();
+
+                    // Date & Time
+                    let date = now.toLocaleDateString();
+                    let time = now.toLocaleTimeString();
+
+                    // Plan validity
+                    let days = 0;
+                    if (planSelect.value == "255") days = 14;
+                    if (planSelect.value == "500") days = 28;
+
+                    let validDate = new Date();
+                    validDate.setDate(now.getDate() + days);
+
+                    paymentSection.style.display = "none";
+                    summary.style.display = "none";
+
+                    finalReceipt.style.display = "block";
+
+                    rName.textContent = "Name: " + nameInput.value;
+                    rMobile.textContent = "Mobile: " + mobileInput.value;
+                    rPlan.textContent = "Plan: ₹" + planSelect.value + " (" + days + " Days)";
+                    rAmount.textContent = "Total Paid: ₹" + gstInput.value;
+                    rPayment.textContent = "Payment Method: " + paymentMethod.value;
+                    rDate.textContent = "Recharge Date: " + date;
+                    rTime.textContent = "Recharge Time: " + time;
+                    rValid.textContent = "Valid Till: " + validDate.toLocaleDateString();
+                }
+            });
+
+        </script>
+
+
+    </body>
+</html>
